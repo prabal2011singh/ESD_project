@@ -1,4 +1,4 @@
-// src/main/java/com/rishabh/yummyrest/controller/LoginController.java
+// src/main/java/com/tasty/tasty/controller/LoginController.java
 package com.tasty.tasty.controller;
 
 import com.tasty.tasty.dto.LoginRequest;
@@ -22,7 +22,7 @@ public class LoginController {
 
     @PostMapping
     public ResponseEntity<String> login(@RequestBody @Valid LoginRequest request) {
-        String message = loginService.login(request);
+        String message = loginService.loginUser(request);
         return ResponseEntity.ok(message);
     }
 

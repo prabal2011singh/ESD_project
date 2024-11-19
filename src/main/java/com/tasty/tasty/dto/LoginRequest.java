@@ -1,15 +1,18 @@
 package com.tasty.tasty.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.*;
 
-@Data
-public class LoginRequest {
-    @Email(message = "Please provide a valid email address")
-    @NotBlank(message = "Email is required")
-    private String email;
+public record LoginRequest(
+        @NotNull(message="Customer email is required")
+        @Email(message = "Email must be in correct format")
 
-    @NotBlank(message = "Password is required")
-    private String password;
+        String email,
+
+        @NotNull(message = "Password should be present")
+        @NotEmpty(message = "Password should be present")
+        @NotBlank(message = "Password should be present")
+        @Size(min = 6, max = 12)
+        String password
+) {
 }

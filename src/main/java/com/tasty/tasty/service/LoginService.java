@@ -1,27 +1,42 @@
-// src/main/java/com/tasty/tasty/service/LoginService.java
 package com.tasty.tasty.service;
+import org.springframework.data.jpa.repository.JpaRepository;
+import java.util.Optional;
 
+import com.tasty.tasty.dto.CustomerRequest;
 import com.tasty.tasty.dto.LoginRequest;
 import com.tasty.tasty.entity.Customer;
+import com.tasty.tasty.mapper.LoginMapper;
 import com.tasty.tasty.repo.CustomerRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import com.tasty.tasty.helper.EncryptionService;
+import com.tasty.tasty.helper.JWTHelper;
 
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 public class LoginService {
 
-    private final CustomerRepo customerRepo;
+    private final CustomerRepo repo;
+    private final LoginMapper mapper;
+    private final EncryptionService encryptionService;
+    private final JWTHelper jwtHelper;
 
-    public String login(LoginRequest request) {
-        Customer customer = customerRepo.findByEmail(request.getEmail())
-                .orElseThrow(() -> new IllegalArgumentException("Invalid email or password."));
+    public String loginUser(LoginRequest request) {
+        Customer customer = mapper.toEntity(request);
+        // Attempt to find the customer in the database
+        Optional<Customer> existingCustomer = repo.findByEmail(customer.getEmail());
 
-
-        if (request.getPassword().equals(customer.getPassword())) {
-            return "User logged in successfully.";
+        if (existingCustomer.isPresent()) {
+            // Check if the password matches
+            if(!encryptionService.validates(request.password(), existingCustomer.get().getPassword())) {
+                return jwtHelper.generateToken(request.email());
+                //return "Wrong Password or Email";
+            }
+            else {
+                return jwtHelper.generateToken(request.email());
+            }
         } else {
-            throw new IllegalArgumentException("Invalid email or password.");
+            return "User not found";
         }
     }
 }

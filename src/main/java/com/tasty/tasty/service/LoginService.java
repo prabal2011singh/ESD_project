@@ -28,12 +28,11 @@ public class LoginService {
 
         if (existingCustomer.isPresent()) {
             // Check if the password matches
-            if(!encryptionService.validates(request.password(), existingCustomer.get().getPassword())) {
+            if(encryptionService.validates(request.password(), existingCustomer.get().getPassword())) {
                 return jwtHelper.generateToken(request.email());
-                //return "Wrong Password or Email";
             }
             else {
-                return jwtHelper.generateToken(request.email());
+                return "Wrong Password or Email";
             }
         } else {
             return "User not found";
